@@ -26,7 +26,7 @@ Cabecera crearListaVacia();
 void mostrarListas(Cabecera lista);
 Cabecera cargarTareas(Cabecera TareasPendientes, int* id);
 Cabecera crearNodo(Cabecera lista, char* descripcion, int* id);
-Nodo* sacarNodoDeTareasPendientes(Cabecera lista, int id);
+Nodo* sacarNodoDeTareasPendientes(Cabecera *lista, int id);
 Cabecera insertarTarea(Cabecera lista, Nodo* tarea);
 int main()
 {
@@ -53,13 +53,22 @@ int main()
     // printf("\n--------Seleccione tareas realizadas para transferir---------\n");
     // printf("Ingrese el ID de la tarea (>= 1000):");
     // scanf("%d", &idIngresada);
-    Nodo *nodoQuitado = sacarNodoDeTareasPendientes(TareasPendientes, 1001);
-    TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
-    mostrarListas(TareasRealizadas);
-    nodoQuitado = sacarNodoDeTareasPendientes(TareasPendientes, 1003);
-    TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+    Nodo *nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1001);
+    if (nodoQuitado == NULL)
+    {
+        printf("no se encontro la id");
+    }else{
+
+        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+    }
+    
+    // mostrarListas(TareasRealizadas);
+    // nodoQuitado = sacarNodoDeTareasPendientes(TareasPendientes, 1003);
+    // TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
     printf("\n\n---------------------------\n\n");
     mostrarListas(TareasRealizadas);
+    printf("\n\n---------------------------\n\n");
+    mostrarListas(TareasPendientes);    
     // if (nodoQuitado)
     // {
     //     printf("\nDescripcion tarea Nodo quitado: %s\n", nodoQuitado->contenedorTarea.descripcion); 
@@ -114,20 +123,37 @@ Cabecera crearNodo(Cabecera lista, char* descripcion, int* id)
     }
     return lista;
 }
-Nodo* sacarNodoDeTareasPendientes(Cabecera lista, int id)
+Nodo* sacarNodoDeTareasPendientes(Cabecera *lista, int id)
 {
-    Cabecera nodoQuitado, aux = lista, anterior;
+    Cabecera nodoQuitado, aux = *lista, anterior = *lista;
     
     while (aux && aux->contenedorTarea.tareaID != id )
     {
         anterior = aux;
         aux = aux->siguiente;
     }
-    nodoQuitado = aux;
-    anterior->siguiente = aux->siguiente;
-    nodoQuitado->siguiente = NULL;
+    if (aux != NULL)
+    {
+        if (aux->siguiente == NULL)
+        {
+            *lista = anterior;
+            anterior= aux->siguiente;
+            (*lista)->siguiente=anterior;
+            
+        }else
+        {
+            anterior= aux->siguiente;
+            *lista= anterior;
+        }
+        nodoQuitado = aux;
+        nodoQuitado->siguiente = NULL;
+        return nodoQuitado;
+    }else
+    {
+        return aux;
+    }
+    
 
-    return nodoQuitado;
     
     
 }
@@ -148,7 +174,7 @@ void mostrarListas(Cabecera lista)
 Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se realizo al utlimo, pudiendo leer asi de arriba haci abajo la ultima tarea que se agrego es la ultimo que se temrino
 {
     Cabecera aux = lista, anterior;
-    if (lista)
+    if (lista != NULL)
     {
         while (aux)
         {
@@ -159,8 +185,8 @@ Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se re
         anterior->siguiente=tarea;
     }else
     {
-        tarea->siguiente = lista;
-        lista = tarea;
+            tarea->siguiente = lista;
+            lista = tarea;
     }
     return lista;
 }
