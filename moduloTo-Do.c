@@ -113,7 +113,7 @@ Cabecera crearNodo(Cabecera lista, char* descripcion, int* id)
     {
         Cabecera aux = lista, anterior;
         
-        while (aux)
+        while (aux) // bloque que me permite pasar agregar la tarea al final
         {
             anterior = aux;
             aux = aux->siguiente;
@@ -126,32 +126,57 @@ Cabecera crearNodo(Cabecera lista, char* descripcion, int* id)
 Nodo* sacarNodoDeTareasPendientes(Cabecera *lista, int id)
 {
     Cabecera nodoQuitado, aux = *lista, anterior = *lista;
-    
-    while (aux && aux->contenedorTarea.tareaID != id )
+    if(*lista == NULL)
     {
-        anterior = aux;
-        aux = aux->siguiente;
-    }
-    if (aux != NULL)
-    {
-        if (aux->siguiente == NULL)
-        {
-            *lista = anterior;
-            anterior= aux->siguiente;
-            (*lista)->siguiente=anterior;
-            
-        }else
-        {
-            anterior= aux->siguiente;
-            *lista= anterior;
-        }
-        nodoQuitado = aux;
-        nodoQuitado->siguiente = NULL;
-        return nodoQuitado;
+        return NULL;
     }else
     {
-        return aux;
+        if (aux != NULL && aux->contenedorTarea.tareaID == id)
+        {
+            (*lista) = (*lista)->siguiente;
+            aux->siguiente = NULL;
+            return aux;
+        }else
+        {
+            while (aux != NULL)
+            {
+                if(aux != NULL && aux->contenedorTarea.tareaID == id)
+                {
+                    anterior->siguiente = aux->siguiente;
+                    aux->siguiente = NULL;
+                    return aux;
+                }
+                anterior =aux;
+                aux=aux->siguiente;
+            }
+        }
+        
     }
+    // while (aux && aux->contenedorTarea.tareaID != id )
+    // {
+    //     anterior = aux;
+    //     aux = aux->siguiente;
+    // }
+    // if (aux != NULL)
+    // {
+    //     if (aux->siguiente == NULL)
+    //     {
+    //         *lista = anterior;
+    //         anterior= aux->siguiente;
+    //         (*lista)->siguiente=anterior;
+            
+    //     }else
+    //     {
+    //         anterior= aux->siguiente;
+    //         *lista= anterior;
+    //     }
+    //     nodoQuitado = aux;
+    //     nodoQuitado->siguiente = NULL;
+    //     return nodoQuitado;
+    // }else
+    // {
+    //     return aux;
+    // }
     
 
     
