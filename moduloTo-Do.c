@@ -3,7 +3,6 @@
 #include <time.h>
 #include <string.h>
 
-
 struct
 {
     int tareaID; //autoincremental comenzando en 1000
@@ -22,17 +21,21 @@ typedef struct Nodo
 typedef Nodo* Cabecera; //defino el tipo de dato de la cabeza de la lista
 
 //definicion funciones
+
 Cabecera crearListaVacia();
 void mostrarListas(Cabecera lista);
 Cabecera cargarTareas(Cabecera TareasPendientes, int* id);
 Cabecera crearNodo(Cabecera lista, char* descripcion, int* id);
 Nodo* sacarNodoDeTareasPendientes(Cabecera *lista, int id);
 Cabecera insertarTarea(Cabecera lista, Nodo* tarea);
+void buscarSegunPalabra(Cabecera listaPendientes, Cabecera listaRealizadas, char* palabraBuscar);
+void buscarSegunID(Cabecera listaPendientes, Cabecera listaRealizadas, int idBuscad);
 int main()
 {
     Cabecera TareasPendientes, TareasRealizadas;
-    int sigueIngresandoTareas=1, id=1000, idIngresada;
-    int* idTarea;
+    int sigueIngresandoTareas=1, id=1000, idIngresada, sigueTransfieriendoTareas=1, sigueBuscando =1;
+    int* idTarea, IDoPalabra, idBuscada;
+    char buffPalabraClave[100];
     idTarea=&id;
     
 
@@ -50,51 +53,50 @@ int main()
     }
     mostrarListas(TareasPendientes);
 
-    // printf("\n--------Seleccione tareas realizadas para transferir---------\n");
-    // printf("Ingrese el ID de la tarea (>= 1000):");
-    // scanf("%d", &idIngresada);
-    Nodo *nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1000);
-    if (nodoQuitado == NULL)
+    while (sigueTransfieriendoTareas == 1)
     {
-        printf("no se encontro la id");
-    }else{
+        printf("\n--------Seleccione tareas realizadas para transferir---------\n\n");
+        printf("Ingrese el ID de la tarea (>= 1000):");
+        scanf("%d", &idIngresada);
+        Nodo *nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, idIngresada);
+        if (nodoQuitado == NULL)
+        {
+            printf("no se encontro la id/no hay tareas para transferir");
+        }else{
 
-        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
-    }
-
-    nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1004);
-    if (nodoQuitado == NULL)
-    {
-        printf("no se encontro la id");
-    }else{
-
-        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
-    }
-
-    nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1002);
-    if (nodoQuitado == NULL)
-    {
-        printf("no se encontro la id");
-    }else{
-
-        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+            TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+            printf("Tarea transferida a la lista de Tareas Realizadas!!\n");
+        }
+        printf("\nDesea seguir transfiriendo tareas? SI:[1]  NO:[0] ");
+        scanf("%d", &sigueTransfieriendoTareas);
     }
     
-    // mostrarListas(TareasRealizadas);
-    // nodoQuitado = sacarNodoDeTareasPendientes(TareasPendientes, 1003);
-    // TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
-    printf("\n\n---------------------------\n\n");
+    printf("\n\n-------------TAREAS REALIZADAS--------------\n\n");
     mostrarListas(TareasRealizadas);
-    printf("\n\n---------------------------\n\n");
+    printf("\n\n--------------TAREAS PENDIENTES-------------\n\n");
     mostrarListas(TareasPendientes);    
-    // if (nodoQuitado)
-    // {
-    //     printf("\nDescripcion tarea Nodo quitado: %s\n", nodoQuitado->contenedorTarea.descripcion); 
-    //     printf("Duracion de las tarea Nodo Quitado: %d\n",nodoQuitado->contenedorTarea.duracion);
-    //     printf("Id Tarea Nodo Quitado: %d",nodoQuitado->contenedorTarea.tareaID); 
-    // }else{
-    //     printf("Error la id de la tarea no coincide con ninguna");
-    // }
+    
+    while (sigueBuscando == 1)
+    {
+        printf("\n----------Buscando por ID o palabra clave----------\n");
+        printf("ingrese por que metodo buscar la tarea: palabra [1] ID [2] ");
+        scanf("%d", &IDoPalabra);
+        fflush(stdin);
+        switch (IDoPalabra)
+        {
+        case 1:
+            printf("\n ingrese la palabra clave para buscar la tarea: ");
+            fgets(buffPalabraClave,100,stdin);
+            buscarSegunPalabra(TareasPendientes, TareasRealizadas, buffPalabraClave);
+            break;
+
+        case 2:
+            printf("\n ingrese el ID para buscar la tarea: ");
+            scanf("%d", &idBuscada);
+            buscarSegunID(TareasPendientes, TareasRealizadas, idBuscada);
+            break;
+        }
+    }
     
 
     return 0;
@@ -109,8 +111,9 @@ Cabecera cargarTareas(Cabecera TareasPendientes, int* id)
 {
     char buff[100];
     printf("Ingresar descripcion de la tarea: \n");
-    // fgets(buff,100,stdin);
-    scanf(" %s",buff); //puedo hacer asi teniendo en cuenta el espacio anterior del %s para poder ignorar el espacio de la anterior cadenas
+    fflush(stdin);
+    fgets(buff,100,stdin);
+    // scanf(" %s",buff); //puedo hacer asi teniendo en cuenta el espacio anterior del %s para poder ignorar el espacio de la anterior cadenas
     TareasPendientes = crearNodo(TareasPendientes, buff, id);
     return TareasPendientes;
 }
@@ -118,7 +121,7 @@ Cabecera crearNodo(Cabecera lista, char* descripcion, int* id)
 {
     Nodo *nuevoNodo; // por que habia que hacerlo puntero ? será porque sino se perdera lo creado por estar dentro de una funcion
     nuevoNodo = (Nodo *) malloc(sizeof (Nodo));
-    nuevoNodo->contenedorTarea.descripcion = (char*) malloc(sizeof(char) * strlen(descripcion+1));
+    nuevoNodo->contenedorTarea.descripcion = (char*) malloc(sizeof(char) * (strlen(descripcion)+1));
     strcpy(nuevoNodo->contenedorTarea.descripcion, descripcion);
     nuevoNodo->contenedorTarea.duracion = rand()%11 +100;
     nuevoNodo->contenedorTarea.tareaID= *id;
@@ -167,37 +170,10 @@ Nodo* sacarNodoDeTareasPendientes(Cabecera *lista, int id)
                 anterior =aux;
                 aux=aux->siguiente;
             }
+            return aux;
         }
         
     }
-    // while (aux && aux->contenedorTarea.tareaID != id )
-    // {
-    //     anterior = aux;
-    //     aux = aux->siguiente;
-    // }
-    // if (aux != NULL)
-    // {
-    //     if (aux->siguiente == NULL)
-    //     {
-    //         *lista = anterior;
-    //         anterior= aux->siguiente;
-    //         (*lista)->siguiente=anterior;
-            
-    //     }else
-    //     {
-    //         anterior= aux->siguiente;
-    //         *lista= anterior;
-    //     }
-    //     nodoQuitado = aux;
-    //     nodoQuitado->siguiente = NULL;
-    //     return nodoQuitado;
-    // }else
-    // {
-    //     return aux;
-    // }
-    
-
-    
     
 }
 void mostrarListas(Cabecera lista)
@@ -213,7 +189,6 @@ void mostrarListas(Cabecera lista)
         printf("\n\n");
     }
 }
-
 Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se realizo al utlimo, pudiendo leer asi de arriba hacia abajo la ultima tarea que se agrego es la ultima que se termino
 {
     Cabecera aux = lista, anterior;
@@ -232,4 +207,64 @@ Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se re
             lista = tarea;
     }
     return lista;
+}
+void buscarSegunPalabra(Cabecera listaPendientes, Cabecera listaRealizadas, char *palabraBuscar)
+{
+    Cabecera auxPend = listaPendientes, auxReal = listaRealizadas;
+    int resultadoComparacion;
+    while (auxPend != NULL || auxReal != NULL)
+    {
+        resultadoComparacion = strcmp(palabraBuscar, auxPend->contenedorTarea.descripcion);
+        if(resultadoComparacion == 0)
+        {
+            printf("-------Tarea coincidente en PENDIENTES-------: \n\n");
+            printf("\nDescripcion tarea: %s\n", auxPend->contenedorTarea.descripcion);
+            printf("Duracion de las tarea: %d\n",auxPend->contenedorTarea.duracion);
+            printf("Id Tarea: %d\n", auxPend->contenedorTarea.tareaID);
+        }
+         resultadoComparacion = strcmp(palabraBuscar, auxReal->contenedorTarea.descripcion);
+        if (resultadoComparacion == 0)
+        {
+            printf("-------Tarea coincidente en REALIZADAS:------- \n\n");
+            printf("\nDescripcion tarea: %s\n", auxPend->contenedorTarea.descripcion);
+            printf("Duracion de las tarea: %d\n",auxPend->contenedorTarea.duracion);
+            printf("Id Tarea: %d\n", auxPend->contenedorTarea.tareaID);
+        }
+        if (auxPend != NULL && auxReal != NULL)
+        {
+            auxPend = auxPend->siguiente; 
+            auxReal = auxReal->siguiente;
+        }else if (auxReal != NULL)
+        {
+            auxReal = auxReal->siguiente;
+        }else{
+            auxPend = auxPend->siguiente; 
+        }
+        
+        
+    }
+    
+}
+void buscarSegunID(Cabecera listaPendientes, Cabecera listaRealizadas, int idBuscad)
+{
+    Cabecera auxPend = listaPendientes, auxReal = listaRealizadas;
+    while (auxPend != NULL && auxReal != NULL)
+    {
+        if(auxPend->contenedorTarea.tareaID == idBuscad)
+        {
+            printf("-------Tarea coincidente en PENDIENTES-------: \n\n");
+            printf("\nDescripcion tarea: %s\n", auxPend->contenedorTarea.descripcion);
+            printf("Duracion de las tarea: %d\n",auxPend->contenedorTarea.duracion);
+            printf("Id Tarea: %d\n", auxPend->contenedorTarea.tareaID);
+        }
+        if (auxReal->contenedorTarea.tareaID == idBuscad)
+        {
+            printf("-------Tarea coincidente en REALIZADAS:------- \n\n");
+            printf("\nDescripcion tarea: %s\n", auxPend->contenedorTarea.descripcion);
+            printf("Duracion de las tarea: %d\n",auxPend->contenedorTarea.duracion);
+            printf("Id Tarea: %d\n", auxPend->contenedorTarea.tareaID);
+        }
+        auxPend = auxPend->siguiente;
+        auxReal = auxReal->siguiente;
+    }
 }
