@@ -53,7 +53,25 @@ int main()
     // printf("\n--------Seleccione tareas realizadas para transferir---------\n");
     // printf("Ingrese el ID de la tarea (>= 1000):");
     // scanf("%d", &idIngresada);
-    Nodo *nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1001);
+    Nodo *nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1000);
+    if (nodoQuitado == NULL)
+    {
+        printf("no se encontro la id");
+    }else{
+
+        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+    }
+
+    nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1004);
+    if (nodoQuitado == NULL)
+    {
+        printf("no se encontro la id");
+    }else{
+
+        TareasRealizadas = insertarTarea(TareasRealizadas, nodoQuitado);
+    }
+
+    nodoQuitado = sacarNodoDeTareasPendientes(&TareasPendientes, 1002);
     if (nodoQuitado == NULL)
     {
         printf("no se encontro la id");
@@ -196,7 +214,7 @@ void mostrarListas(Cabecera lista)
     }
 }
 
-Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se realizo al utlimo, pudiendo leer asi de arriba haci abajo la ultima tarea que se agrego es la ultimo que se temrino
+Cabecera insertarTarea(Cabecera lista, Nodo* tarea) //inserta la tarea que se realizo al utlimo, pudiendo leer asi de arriba hacia abajo la ultima tarea que se agrego es la ultima que se termino
 {
     Cabecera aux = lista, anterior;
     if (lista != NULL)
